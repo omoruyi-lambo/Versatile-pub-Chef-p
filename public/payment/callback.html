@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Order Confirmed — Versatile Pub by Chef P Kitchen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{--gold:#ff7a1a;--bg:#120b08;--card:#1a1008;--card2:#221408;--green:#4caf50;--red:#f44336;--border:rgba(255,255,255,.07);}
+    body{background:var(--bg);color:#fff;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;}
+    .nav{position:fixed;top:0;left:0;right:0;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;background:rgba(18,11,8,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:100;}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo-icon{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;}
+    .nav-logo-text{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;}
+    .nav-logo-sub{font-size:.62rem;color:#666;}
+    .back-link{color:#777;font-size:.82rem;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.18s;}
+    .back-link:hover{color:var(--gold);}
+    .main{margin-top:88px;width:100%;max-width:540px;padding:0 0 60px;}
+    .spin-wrap{text-align:center;padding:80px 0;}
+    .spin{width:50px;height:50px;border:3px solid #2a1a10;border-top-color:var(--gold);border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 18px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;overflow:hidden;animation:up .4s ease;}
+    @keyframes up{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .hero{padding:36px 28px 28px;text-align:center;}
+    .hero.paid-hero{background:linear-gradient(135deg,#0a2a0a,#0d2a08);}
+    .hero.pod-hero{background:linear-gradient(135deg,#1a0e04,#251504);}
+    .hero-icon{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2rem;}
+    .paid-icon{background:rgba(76,175,80,.12);border:2px solid rgba(76,175,80,.3);color:var(--green);}
+    .pod-icon{background:rgba(255,122,26,.1);border:2px solid rgba(255,122,26,.28);color:var(--gold);}
+    .hero h1{font-family:'Playfair Display',serif;font-size:1.65rem;margin-bottom:8px;}
+    .hero.paid-hero p{color:#8aaa8a;font-size:.88rem;line-height:1.6;}
+    .hero.pod-hero p{color:#b8955a;font-size:.88rem;line-height:1.6;}
+    .eta-bar{padding:13px 22px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+    .eta-bar.paid-eta{background:rgba(76,175,80,.06);border-top:1px solid rgba(76,175,80,.1);}
+    .eta-bar.pod-eta{background:rgba(255,122,26,.06);border-top:1px solid rgba(255,122,26,.1);}
+    .eta-bar i{font-size:1.2rem;}
+    .eta-bar.paid-eta i{color:var(--green);}
+    .eta-bar.pod-eta i{color:var(--gold);}
+    .eta-text{font-size:.84rem;line-height:1.5;}
+    .eta-text strong{color:#fff;}
+    .body{padding:22px;}
+    .sec-label{font-size:.65rem;font-weight:700;letter-spacing:1.8px;color:#666;text-transform:uppercase;margin-bottom:9px;}
+    .ref-box{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+    .ref-label-txt{font-size:.76rem;color:#777;display:flex;align-items:center;gap:6px;}
+    .ref-val{font-family:monospace;color:var(--gold);font-size:.88rem;font-weight:700;word-break:break-all;text-align:right;max-width:260px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
+    .cell{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;}
+    .cell.full{grid-column:1/-1;}
+    .cell-l{font-size:.68rem;color:#777;margin-bottom:3px;}
+    .cell-v{font-size:.86rem;color:#fff;font-weight:500;}
+    .items-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:18px;}
+    .irow{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);}
+    .irow:last-child{border-bottom:none;}
+    .iname{font-size:.84rem;color:#ddd;}
+    .iqty{font-size:.72rem;color:#777;margin-top:2px;}
+    .iprice{font-size:.84rem;color:var(--gold);font-weight:600;white-space:nowrap;}
+    .totals-box{background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+    .trow{display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.84rem;}
+    .trow:last-child{border-bottom:none;background:rgba(255,122,26,.06);font-size:.92rem;font-weight:700;}
+    .t-lbl{color:#888;}
+    .t-val{color:#fff;}
+    .t-val.gold{color:var(--gold);}
+    .t-val.green{color:var(--green);}
+    .actions{display:flex;flex-direction:column;gap:10px;}
+    .btn{display:flex;align-items:center;justify-content:center;gap:9px;padding:13px 20px;border-radius:50px;font-size:.9rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:.2s;font-family:'DM Sans',sans-serif;}
+    .btn-primary{background:var(--gold);color:#fff;}
+    .btn-primary:hover{background:#e06010;}
+    .btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.15);color:#bbb;}
+    .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+    .note-box{background:rgba(255,122,26,.06);border:1px solid rgba(255,122,26,.18);border-radius:10px;padding:13px 15px;margin-bottom:20px;display:flex;gap:11px;align-items:flex-start;font-size:.82rem;color:#c89060;line-height:1.55;}
+    .note-box i{color:var(--gold);flex-shrink:0;margin-top:2px;}
+    .err-wrap{text-align:center;padding:44px 28px;}
+    .err-wrap .err-ic{font-size:3rem;color:var(--red);margin-bottom:14px;}
+    .err-wrap h2{font-family:'Playfair Display',serif;margin-bottom:10px;}
+    .err-wrap p{color:#aaa;font-size:.88rem;line-height:1.65;margin-bottom:6px;}
+    @media(max-width:480px){.grid2{grid-template-columns:1fr;}.nav{padding:12px 16px;}}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-icon"><i class="fa-solid fa-utensils"></i></div>
+    <div>
+      <div class="nav-logo-text">Versatile Pub</div>
+      <div class="nav-logo-sub">BY CHEF P KITCHEN</div>
+    </div>
+  </a>
+  <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+</nav>
+
+<div class="main" id="main">
+  <div class="spin-wrap">
+    <div class="spin"></div>
+    <p style="color:#777;font-size:.88rem;">Confirming your order...</p>
+  </div>
+</div>
+
+<script>
+function renderSuccess(order, ref, isPaid) {
+  var items = order.items || [];
+  var total = Number(order.grandTotal || order.total || 0);
+  var fee   = Number(order.deliveryFee || 0);
+  var sub   = Number(order.subtotal || (total - fee));
+  var isD   = order.isDelivery;
+
+  var itemsHTML = items.length
+    ? '<div class="sec-label" style="margin-top:4px;">Items Ordered</div><div class="items-box">' +
+      items.map(function(i){
+        var n=i.name||i.itemName||'Item', q=i.quantity||i.qty||1, p=Number(i.price||0);
+        return '<div class="irow"><div><div class="iname">'+n+'</div><div class="iqty">Qty: '+q+'</div></div><div class="iprice">&#x20A6;'+(q*p).toLocaleString()+'</div></div>';
+      }).join('')+'</div>' : '';
+
+  document.getElementById('main').innerHTML =
+    '<div class="card">' +
+      '<div class="hero '+(isPaid?'paid-hero':'pod-hero')+'">' +
+        '<div class="hero-icon '+(isPaid?'paid-icon':'pod-icon')+'"><i class="fa-solid fa-'+(isPaid?'check':'bowl-food')+'"></i></div>' +
+        '<h1>'+(isPaid?'Payment Confirmed!':'Order Received!')+'</h1>' +
+        '<p>'+(isPaid
+          ?'Your payment was successful. We\'re already preparing your delicious meal!'
+          :'Your order is confirmed. Please have <strong>&#x20A6;'+total.toLocaleString()+'</strong> ready when your food arrives.')+'</p>' +
+      '</div>' +
+      '<div class="eta-bar '+(isPaid?'paid-eta':'pod-eta')+'">' +
+        '<i class="fa-solid fa-'+(isD?'motorcycle':'clock')+'"></i>' +
+        '<div class="eta-text">'+(isD
+          ?'<strong>'+(isPaid?'On the way soon!':'Order sent to kitchen!')+'</strong><br>Estimated delivery: <strong>30–45 minutes</strong>'
+          :'<strong>'+(isPaid?'Being prepared now!':'Order queued!')+'</strong><br>Ready for pickup in <strong>20–30 minutes</strong>')+'</div>' +
+      '</div>' +
+      '<div class="body">' +
+        '<div class="sec-label">Order Reference</div>' +
+        '<div class="ref-box"><span class="ref-label-txt"><i class="fa-solid fa-receipt"></i> Ref</span><span class="ref-val">'+(ref||'N/A').toUpperCase()+'</span></div>' +
+        (!isPaid?'<div class="note-box"><i class="fa-solid fa-circle-info"></i>'+(isD ? 'Please have the exact cash amount ready for your delivery rider. The rider will confirm your order on arrival.' : 'Please have the exact cash amount ready when you collect your order at the restaurant.')+'</div>':'') +
+        '<div class="sec-label">Your Details</div>' +
+        '<div class="grid2">' +
+          '<div class="cell"><div class="cell-l">Name</div><div class="cell-v">'+(order.customerName||'Guest')+'</div></div>' +
+          '<div class="cell"><div class="cell-l">Phone</div><div class="cell-v">'+(order.customerPhone||'N/A')+'</div></div>' +
+          '<div class="cell"><div class="cell-l">Fulfillment</div><div class="cell-v" style="color:var(--gold);">'+(isD?'&#x1F6D5; Delivery':'&#x1F3EA; Pickup')+'</div></div>' +
+          '<div class="cell"><div class="cell-l">Payment</div><div class="cell-v" style="color:'+(isPaid?'var(--green)':'var(--gold)')+';"> '+(isPaid?'&#x2705; Paid Online':'&#x1F4B5; Cash on Delivery')+'</div></div>' +
+          (isD&&order.deliveryAddress?'<div class="cell full"><div class="cell-l">Delivery Address</div><div class="cell-v">'+order.deliveryAddress+'</div></div>':'') +
+        '</div>' +
+        itemsHTML +
+        '<div class="sec-label" style="margin-top:4px;">Order Summary</div>' +
+        '<div class="totals-box">' +
+          '<div class="trow"><span class="t-lbl">Subtotal</span><span class="t-val">&#x20A6;'+sub.toLocaleString()+'</span></div>' +
+          (fee>0?'<div class="trow"><span class="t-lbl">Delivery Fee</span><span class="t-val">&#x20A6;'+fee.toLocaleString()+'</span></div>':'<div class="trow"><span class="t-lbl">Delivery Fee</span><span class="t-val green">FREE</span></div>') +
+          '<div class="trow"><span class="t-lbl">Total</span><span class="t-val gold">&#x20A6;'+total.toLocaleString()+'</span></div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<a href="/" class="btn btn-primary"><i class="fa-solid fa-house"></i> Back to Home</a>' +
+          '<a href="/#menu" class="btn btn-outline"><i class="fa-solid fa-book-open"></i> Order More</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function renderError(ref, msg) {
+  document.getElementById('main').innerHTML =
+    '<div class="card"><div class="err-wrap">' +
+      '<div class="err-ic"><i class="fa-solid fa-circle-xmark"></i></div>' +
+      '<h2>Order Not Verified</h2>' +
+      '<p>'+(msg||'We could not confirm your payment. If money was deducted, please contact us immediately.')+'</p>' +
+      (ref?'<div style="background:var(--card2);border-radius:8px;padding:10px 14px;font-family:monospace;color:var(--gold);font-size:.82rem;margin:14px 0;word-break:break-all;">Ref: '+ref+'</div>':'') +
+      '<p style="margin-bottom:22px;">Call us on <strong>0905 215 5013</strong> with your reference and we will resolve it.</p>' +
+      '<div style="display:flex;flex-direction:column;gap:10px;">' +
+        '<a href="tel:09052155013" class="btn btn-primary" style="text-decoration:none;"><i class="fa-solid fa-phone"></i> Call Us Now</a>' +
+        '<a href="/" class="btn btn-outline" style="text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>' +
+      '</div>' +
+    '</div></div>';
+}
+
+(async function(){
+  var params    = new URLSearchParams(window.location.search);
+  var ref       = params.get('reference') || params.get('trxref');
+  var paidParam = params.get('paid'); // '1' = online paid, '0' = POD, null = legacy
+  var stored    = null;
+  try { stored = JSON.parse(sessionStorage.getItem('vp_last_order')); } catch(e){}
+
+  if (!ref && !stored) { renderError(null,'No order reference found. Please place your order from our menu.'); return; }
+
+  // ── Pay on Delivery — skip Paystack verification entirely ──
+  if (paidParam === '0') {
+    renderSuccess(stored || { ref: ref }, ref, false);
+    return;
+  }
+
+  // ── Internal reference (VPK- or POD-) — not a Paystack ref ──
+  // These are generated by our backend, not Paystack — skip verification
+  if (ref && (ref.startsWith('VPK-') || ref.startsWith('POD-'))) {
+    if (stored) {
+      renderSuccess(stored, ref, paidParam === '1');
+    } else {
+      renderSuccess({ ref: ref }, ref, paidParam === '1');
+    }
+    return;
+  }
+
+  // ── Real Paystack reference — verify with backend ──────────
+  if (ref) {
+    try {
+      var res  = await fetch('/api/paystack/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ reference: ref, orderData: stored }) });
+      var data = await res.json();
+      if (data.success) {
+        renderSuccess(Object.assign({}, stored||{}, data.order||{}), ref, true);
+      } else if (stored) {
+        renderSuccess(stored, ref, true);
+      } else {
+        renderError(ref, data.message);
+      }
+    } catch(e) {
+      if (stored) { renderSuccess(stored, ref, paidParam !== '0'); }
+      else { renderError(ref, 'Could not reach our server. Please call us with your reference number.'); }
+    }
+  } else if (stored) {
+    renderSuccess(stored, stored.ref||'N/A', false);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+╔═══════════════════════════════════════════════════════╗
+║     VERSATILE PUB / CHEF P'S KITCHEN — START GUIDE   ║
+╚═══════════════════════════════════════════════════════╝
+
+⚠️  IMPORTANT: Do NOT open the HTML files by double-clicking.
+    They will NOT work that way. You must run the server first.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1 — Install Node.js (only once)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Go to: https://nodejs.org
+ Download and install the LTS version.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 2 — Set up MongoDB (free, only once)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 1. Go to: https://cloud.mongodb.com
+ 2. Create a free account and a free cluster (M0)
+ 3. Click "Connect" → "Drivers" → copy the connection string
+    It looks like: mongodb+srv://user:password@cluster0.xxxxx.mongodb.net/
+ 4. Keep it — you'll need it in Step 3.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 3 — Configure the environment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 1. Find the file called ".env.example" in this folder
+ 2. Make a copy of it and rename the copy to just: .env
+ 3. Open .env in Notepad and fill in:
+
+    MONGO_URI=paste your MongoDB connection string here
+    JWT_SECRET=make up any long random password here
+    ADMIN_PASSWORD=ChefP2026!    ← change this if you like
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 4 — Install packages (only once)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 1. Open a terminal / command prompt in this folder
+    (Right-click the folder → "Open in Terminal")
+ 2. Type this and press Enter:
+
+    npm install
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 5 — Start the server
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ In the same terminal, type:
+
+    npm start
+
+ You will see:  "Running on http://localhost:5000"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 6 — Open the website
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Open your browser and go to:
+
+ 🌐  Restaurant website:   http://localhost:5000
+ 🔒  Admin dashboard:      http://localhost:5000/admin-dashboard.html
+ 📅  Reservations:         http://localhost:5000/reserve.html
+
+ Admin login:
+   Username: admin
+   Password: ChefP2026!
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ PAGE LINKS (all already connected)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ index.html          → Homepage (main site)
+ reserve.html        → Table reservations
+ admin-dashboard.html→ Restaurant admin panel
+ privacy-policy.html → Privacy policy
+ terms.html          → Terms & conditions
+ cookie-policy.html  → Cookie policy
+
+ All pages link to each other in their navbars and footers.
+ The "Staff Login" link is in the footer of the homepage.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ EVERY TIME you want to run the site:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Just open terminal in this folder and run:
+
+    npm start
+
+ Then open http://localhost:5000 in your browser.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Phone: 0905 215 5013  |  17A Jemide Ave, GRA, Benin City
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

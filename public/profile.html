@@ -1,0 +1,865 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ðŸ½ï¸</text></svg>"/>
+<title>My Account â€” Versatile Pub by Chef P Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    const publicConfig = await fetch('/api/settings/public')
+      .then(r => r.json())
+      .then(data => data && data.success ? (data.settings || {}) : {})
+      .catch(() => ({}));
+
+    if (!publicConfig.oneSignalAppId) {
+      console.warn('OneSignal is not configured yet.');
+      return;
+    }
+
+    const oneSignalConfig = {
+      appId: publicConfig.oneSignalAppId,
+      notifyButton: { enable: true },
+    };
+
+    if (publicConfig.oneSignalSafariWebId) {
+      oneSignalConfig.safari_web_id = publicConfig.oneSignalSafariWebId;
+    }
+
+    await OneSignal.init(oneSignalConfig);
+    window.savePlayerId = async function() {
+      try {
+        const playerId = OneSignal.User.PushSubscription.id;
+        if (!playerId) return;
+        window._customerPlayerId = playerId;
+        localStorage.setItem('vp_player_id', playerId);
+        const token = localStorage.getItem('vp_customer_token') || null;
+        fetch('/api/settings/player-id', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ playerId, token }) }).catch(()=>{});
+      } catch(e) {}
+    };
+    OneSignal.User.PushSubscription.addEventListener('change', async (e) => { if (e.current.optedIn) await window.savePlayerId(); });
+    if (OneSignal.User.PushSubscription.optedIn) await window.savePlayerId();
+    const stored = localStorage.getItem('vp_player_id');
+    if (stored) window._customerPlayerId = stored;
+  });
+</script>
+<style>
+:root{
+  --bg:#120b08;--bg2:#1b110d;--card:#1e1008;--card2:#261510;--card3:#2e1a0e;
+  --gold:#ff7a1a;--gold2:#d95b05;--gs:rgba(255,122,26,.1);--gb:rgba(255,122,26,.22);
+  --white:#fff7f1;--muted:#a48d7d;--light:#e0c8b7;
+  --green:#22c55e;--greens:rgba(34,197,94,.1);--greenb:rgba(34,197,94,.22);
+  --red:#ff4d6d;--reds:rgba(255,77,109,.1);--redb:rgba(255,77,109,.22);
+  --blue:#5b9fff;--blues:rgba(91,159,255,.1);--amber:#f5c842;--ambers:rgba(245,200,66,.1);
+  --r:12px;--ease:cubic-bezier(.4,0,.2,1);
+  --nav-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{background:var(--bg);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--gold2);border-radius:4px;}
+
+/* â•â• TOP NAV â•â• */
+.top-nav{position:sticky;top:0;z-index:200;background:rgba(18,11,8,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);padding:0 20px;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.nav-left{display:flex;align-items:center;gap:12px;}
+.back-btn{width:36px;height:36px;border-radius:9px;background:var(--card2);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:var(--light);font-size:.9rem;cursor:pointer;flex-shrink:0;transition:all .18s;}
+.back-btn:hover{background:var(--gs);color:var(--gold);border-color:var(--gb);}
+.nav-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.nav-notif-btn{position:relative;width:36px;height:36px;border-radius:9px;background:var(--card2);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;color:var(--light);font-size:.88rem;cursor:pointer;transition:all .18s;}
+.nav-notif-btn:hover{background:var(--gs);color:var(--gold);border-color:var(--gb);}
+.nav-notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg2);display:none;}
+.nav-notif-dot.show{display:block;}
+
+/* â•â• DESKTOP LAYOUT â•â• */
+.page-wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+.page-grid{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start;}
+@media(max-width:860px){.page-grid{grid-template-columns:1fr;}}
+
+/* â•â• LEFT SIDEBAR (desktop) â•â• */
+.sidebar-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:18px;overflow:hidden;position:sticky;top:calc(var(--nav-h) + 16px);}
+.profile-header-block{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center;}
+.profile-avatar{width:76px;height:76px;border-radius:20px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:#fff;margin:0 auto 14px;box-shadow:0 8px 24px rgba(255,122,26,.35);}
+.profile-name{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:800;margin-bottom:4px;}
+.profile-email{font-size:.76rem;color:var(--muted);margin-bottom:10px;word-break:break-all;}
+.profile-badge{display:inline-flex;align-items:center;gap:5px;background:var(--greens);border:1px solid var(--greenb);border-radius:50px;padding:4px 12px;font-size:.68rem;font-weight:700;color:var(--green);}
+
+/* Sidebar nav */
+.sb-nav{padding:10px;}
+.sb-nav-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;font-size:.84rem;font-weight:500;color:var(--light);cursor:pointer;transition:all .16s;margin-bottom:2px;border:1px solid transparent;position:relative;}
+.sb-nav-item:hover{background:var(--card2);color:var(--white);}
+.sb-nav-item.active{background:var(--gs);color:var(--gold);border-color:var(--gb);}
+.sb-nav-item i{width:16px;font-size:.8rem;text-align:center;flex-shrink:0;}
+.sb-nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:50px;min-width:18px;text-align:center;}
+.sb-divider{height:1px;background:rgba(255,255,255,.05);margin:6px 10px;}
+.sb-signout{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;font-size:.84rem;font-weight:500;color:var(--red);cursor:pointer;transition:all .16s;width:100%;border:none;background:none;font-family:'DM Sans',sans-serif;}
+.sb-signout:hover{background:var(--reds);}
+.sb-signout i{width:16px;font-size:.8rem;text-align:center;}
+
+/* â•â• MAIN CONTENT AREA â•â• */
+.main-content{min-width:0;}
+.content-section{display:none;}
+.content-section.active{display:block;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:800;display:flex;align-items:center;gap:8px;}
+.section-title i{color:var(--gold);font-size:.9rem;}
+
+/* â•â• ORDER CARDS â•â• */
+.order-filter-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.ofd-tab{padding:7px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,.08);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;}
+.ofd-tab.active{background:var(--gs);color:var(--gold);border-color:var(--gb);}
+.order-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:14px;margin-bottom:12px;overflow:hidden;}
+.order-progress{height:3px;background:rgba(255,255,255,.04);}
+.order-progress-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.order-card-body{padding:16px;}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.order-ref{font-size:.74rem;font-weight:800;color:var(--gold);letter-spacing:.5px;}
+.order-date{font-size:.68rem;color:var(--muted);margin-top:2px;}
+.order-status-badge{display:flex;align-items:center;gap:5px;border-radius:50px;padding:4px 11px;font-size:.7rem;font-weight:700;flex-shrink:0;}
+.order-items{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.order-item-chip{background:rgba(255,255,255,.05);border-radius:6px;padding:3px 9px;font-size:.7rem;color:var(--light);}
+.order-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.05);padding-top:10px;}
+.order-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.order-meta-item{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:4px;}
+.order-meta-item i{color:var(--gold);font-size:.65rem;}
+.order-total{font-weight:800;font-size:.92rem;color:var(--gold);}
+.order-rejection{margin-top:10px;background:var(--reds);border:1px solid var(--redb);border-radius:8px;padding:9px 12px;font-size:.74rem;color:var(--red);display:flex;align-items:flex-start;gap:6px;}
+
+/* Order timeline */
+.order-timeline{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);}
+.order-timeline-title{font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.timeline-steps{display:flex;align-items:flex-start;position:relative;}
+.timeline-steps::before{content:'';position:absolute;top:11px;left:11px;right:11px;height:2px;background:rgba(255,255,255,.06);z-index:0;}
+.ts{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;z-index:1;}
+.ts-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.12);background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:.55rem;transition:all .3s;}
+.ts-dot.done{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 0 8px rgba(34,197,94,.4);}
+.ts-dot.active{background:var(--gold);border-color:var(--gold);color:#000;box-shadow:0 0 12px rgba(255,122,26,.5);animation:pulse-dot 1.5s ease-in-out infinite;}
+.ts-dot.failed{background:var(--red);border-color:var(--red);color:#fff;}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 12px rgba(255,122,26,.5);}50%{box-shadow:0 0 22px rgba(255,122,26,.85);}}
+.ts-label{font-size:.58rem;color:var(--muted);text-align:center;line-height:1.3;max-width:52px;}
+.ts.active-step .ts-label{color:var(--gold);font-weight:700;}
+.ts.done-step .ts-label{color:var(--green);}
+.ts.failed-step .ts-label{color:var(--red);}
+
+/* â•â• NOTIFICATIONS â•â• */
+.notif-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.notif-count{font-size:.78rem;color:var(--muted);}
+.notif-actions{display:flex;gap:8px;}
+.notif-action-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--muted);font-size:.73rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .16s;display:flex;align-items:center;gap:5px;}
+.notif-action-btn:hover{color:var(--gold);border-color:var(--gb);background:var(--gs);}
+.notif-action-btn.danger:hover{color:var(--red);border-color:var(--redb);background:var(--reds);}
+.notif-filter-tabs{display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;}
+.notif-ftab{padding:6px 14px;border-radius:50px;border:1.5px solid rgba(255,255,255,.08);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;}
+.notif-ftab.active{background:var(--gs);color:var(--gold);border-color:var(--gb);}
+
+/* Notification card */
+.notif-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:13px;padding:14px 16px;margin-bottom:10px;display:flex;gap:13px;align-items:flex-start;cursor:pointer;transition:all .18s;position:relative;}
+.notif-card:hover{background:var(--card2);transform:translateX(3px);}
+.notif-card.unread{border-left:3px solid var(--gold);background:rgba(255,122,26,.04);}
+.notif-card.unread:hover{background:rgba(255,122,26,.08);}
+.notif-icon-wrap{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+/* icon colour per type */
+.ni-order{background:var(--gs);color:var(--gold);}
+.ni-alert{background:var(--reds);color:var(--red);}
+.ni-info{background:var(--blues);color:var(--blue);}
+.ni-success{background:var(--greens);color:var(--green);}
+.ni-promo{background:var(--ambers);color:var(--amber);}
+.notif-body{flex:1;min-width:0;}
+.notif-title{font-size:.84rem;font-weight:700;margin-bottom:3px;line-height:1.35;}
+.notif-msg{font-size:.77rem;color:var(--muted);line-height:1.55;}
+.notif-time{font-size:.65rem;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:4px;}
+.notif-time i{font-size:.6rem;}
+.notif-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;box-shadow:0 0 6px rgba(255,122,26,.5);}
+.notif-empty{text-align:center;padding:52px 20px;color:var(--muted);}
+.notif-empty i{font-size:2.6rem;color:rgba(255,122,26,.2);margin-bottom:14px;display:block;}
+.notif-empty h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--white);margin-bottom:6px;}
+.notif-empty p{font-size:.8rem;line-height:1.6;}
+
+/* â•â• PROFILE FORM â•â• */
+.form-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;margin-bottom:14px;}
+.form-card-title{font-size:.68rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.form-card-title i{color:var(--gold);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+.form-field{margin-bottom:12px;}
+.form-label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.form-input{width:100%;padding:11px 14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.08);border-radius:10px;color:var(--white);font-size:.88rem;outline:none;font-family:'DM Sans',sans-serif;transition:border-color .18s;}
+.form-input:focus{border-color:var(--gb);background:rgba(255,122,26,.04);}
+.form-input::placeholder{color:var(--muted);}
+.form-input:disabled{opacity:.4;cursor:not-allowed;}
+.btn-save{width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:.9rem;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-save:hover{opacity:.9;transform:translateY(-1px);}
+.btn-danger{width:100%;padding:12px;background:var(--reds);border:1px solid var(--redb);border-radius:10px;color:var(--red);font-weight:700;cursor:pointer;font-size:.85rem;font-family:'DM Sans',sans-serif;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-danger:hover{background:rgba(255,77,109,.2);}
+
+/* â•â• EMPTY STATE â•â• */
+.empty-state{text-align:center;padding:52px 20px;color:var(--muted);}
+.empty-state i{font-size:2.6rem;color:rgba(255,122,26,.2);margin-bottom:14px;display:block;}
+.empty-state h3{font-family:'Playfair Display',serif;font-size:1rem;color:var(--white);margin-bottom:6px;}
+.empty-state p{font-size:.8rem;line-height:1.6;}
+.empty-state a{color:var(--gold);}
+
+/* â•â• SPINNER â•â• */
+.spinner{display:flex;align-items:center;justify-content:center;padding:44px;color:var(--muted);font-size:.84rem;gap:10px;}
+.spinner i{color:var(--gold);}
+
+/* â•â• NOT LOGGED IN â•â• */
+.not-logged-in{text-align:center;padding:80px 20px;}
+.not-logged-in i{font-size:3.2rem;color:var(--gold);margin-bottom:18px;display:block;}
+.not-logged-in h2{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:10px;}
+.not-logged-in p{font-size:.86rem;color:var(--muted);line-height:1.6;margin-bottom:28px;max-width:320px;margin-left:auto;margin-right:auto;}
+.btn-login{display:inline-flex;align-items:center;gap:8px;padding:13px 30px;background:linear-gradient(135deg,var(--gold),var(--gold2));border:none;border-radius:50px;color:#fff;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 18px rgba(255,122,26,.3);}
+
+/* â•â• TOAST â•â• */
+.toast-msg{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--card2);border:1px solid var(--gb);border-radius:50px;padding:9px 20px;font-size:.8rem;color:var(--white);z-index:9000;transition:transform .28s;display:flex;align-items:center;gap:8px;white-space:nowrap;backdrop-filter:blur(12px);pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.toast-msg.show{transform:translateX(-50%) translateY(0);}
+.toast-msg i{color:var(--gold);}
+
+/* â•â• MOBILE TAB BAR â•â• */
+.mobile-tabs{display:none;border-bottom:1px solid rgba(255,255,255,.06);background:var(--bg);}
+.mobile-tab-btn{flex:1;padding:13px 6px;font-size:.76rem;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;border-bottom:2px solid transparent;transition:all .18s;position:relative;}
+.mobile-tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.mobile-tab-btn .tab-badge{position:absolute;top:8px;right:calc(50% - 20px);background:var(--red);color:#fff;border-radius:50%;width:14px;height:14px;font-size:.52rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.mobile-tab-btn .tab-badge.hide{display:none;}
+
+/* Stats row in profile header on mobile */
+.stats-row{display:flex;gap:10px;margin-top:16px;}
+.stat-pill{flex:1;background:var(--card2);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px;text-align:center;}
+.stat-pill-num{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--gold);}
+.stat-pill-lbl{font-size:.62rem;color:var(--muted);margin-top:2px;}
+
+/* â•â• RESPONSIVE â•â• */
+@media(max-width:860px){
+  .page-wrap{padding:0 0 80px;}
+  .sidebar-card{border-radius:0;border:none;border-bottom:1px solid rgba(255,255,255,.06);position:static;}
+  .profile-header-block{display:flex;align-items:center;gap:16px;text-align:left;padding:20px 16px;}
+  .profile-avatar{width:62px;height:62px;font-size:1.4rem;margin:0;flex-shrink:0;}
+  .sb-nav{display:none;}
+  .sb-divider{display:none;}
+  .mobile-tabs{display:flex;}
+  .main-content{padding:0;}
+  .content-section{padding:14px 16px;}
+  .section-header{padding:0;}
+}
+@media(min-width:861px){
+  .mobile-tabs{display:none !important;}
+  .mobile-tab-btn .tab-badge{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="/" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+    <div class="nav-title">My Account</div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-notif-btn" id="navNotifBtn" onclick="switchSection('notifications')" title="Notifications">
+      <i class="fa-solid fa-bell"></i>
+      <div class="nav-notif-dot" id="navNotifDot"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- NOT LOGGED IN -->
+<div class="not-logged-in" id="notLoggedIn" style="display:none;">
+  <i class="fa-solid fa-user-lock"></i>
+  <h2>Sign In to View Account</h2>
+  <p>Please sign in to view your orders, notifications and manage your profile.</p>
+  <a href="/" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Sign In on Main Site</a>
+</div>
+
+<!-- LOGGED IN CONTENT -->
+<div id="loggedInContent" style="display:none;">
+  <div class="page-wrap">
+    <div class="page-grid">
+
+      <!-- â•â• LEFT SIDEBAR (desktop) â•â• -->
+      <aside class="sidebar-card">
+        <div class="profile-header-block">
+          <div class="profile-avatar" id="paAvatar">?</div>
+          <div>
+            <div class="profile-name" id="paName">Loading...</div>
+            <div class="profile-email" id="paEmail"></div>
+            <div class="profile-badge" style="margin-top:8px;"><i class="fa-solid fa-circle-check"></i> Verified Customer</div>
+            <!-- Mobile stats -->
+            <div class="stats-row" id="mobileStats" style="display:none;">
+              <div class="stat-pill"><div class="stat-pill-num" id="statOrders">0</div><div class="stat-pill-lbl">Orders</div></div>
+              <div class="stat-pill"><div class="stat-pill-num" id="statNotifs">0</div><div class="stat-pill-lbl">Alerts</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop sidebar nav -->
+        <nav class="sb-nav">
+          <div class="sb-nav-item active" id="sbn-orders" onclick="switchSection('orders')">
+            <i class="fa-solid fa-box"></i> My Orders
+          </div>
+          <div class="sb-nav-item" id="sbn-notifications" onclick="switchSection('notifications')">
+            <i class="fa-solid fa-bell"></i> Notifications
+            <span class="sb-nav-badge" id="sbNotifBadge" style="display:none;">0</span>
+          </div>
+          <div class="sb-nav-item" id="sbn-profile" onclick="switchSection('profile')">
+            <i class="fa-solid fa-user"></i> Edit Profile
+          </div>
+          <div class="sb-divider"></div>
+          <button class="sb-signout" onclick="confirmSignOut()">
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+          </button>
+        </nav>
+      </aside>
+
+      <!-- â•â• MAIN CONTENT â•â• -->
+      <div class="main-content">
+
+        <!-- Mobile tab bar -->
+        <div class="mobile-tabs">
+          <button class="mobile-tab-btn active" id="mbn-orders" onclick="switchSection('orders')">
+            <i class="fa-solid fa-box"></i> Orders
+          </button>
+          <button class="mobile-tab-btn" id="mbn-notifications" onclick="switchSection('notifications')">
+            <i class="fa-solid fa-bell"></i> Alerts
+            <span class="tab-badge hide" id="mobileNotifBadge">0</span>
+          </button>
+          <button class="mobile-tab-btn" id="mbn-profile" onclick="switchSection('profile')">
+            <i class="fa-solid fa-user"></i> Profile
+          </button>
+        </div>
+
+        <!-- â”€â”€ ORDERS SECTION â”€â”€ -->
+        <div class="content-section active" id="sec-orders">
+          <div class="section-header">
+            <div class="section-title"><i class="fa-solid fa-box"></i> Order History</div>
+          </div>
+          <div class="order-filter-tabs" id="orderFilterTabs">
+            <button class="ofd-tab active" onclick="filterOrdersBy('all',this)">All Orders</button>
+            <button class="ofd-tab" onclick="filterOrdersBy('active',this)">Active</button>
+            <button class="ofd-tab" onclick="filterOrdersBy('delivered',this)">Delivered</button>
+            <button class="ofd-tab" onclick="filterOrdersBy('cancelled',this)">Cancelled</button>
+          </div>
+          <div class="spinner" id="ordersLoading"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</div>
+          <div id="ordersContainer"></div>
+        </div>
+
+        <!-- â”€â”€ NOTIFICATIONS SECTION â”€â”€ -->
+        <div class="content-section" id="sec-notifications">
+          <div class="section-header">
+            <div class="section-title"><i class="fa-solid fa-bell"></i> Notifications</div>
+            <div class="notif-actions">
+              <button class="notif-action-btn" onclick="markAllNotifsRead()"><i class="fa-solid fa-check-double"></i> Mark all read</button>
+              <button class="notif-action-btn danger" onclick="clearAllNotifs()"><i class="fa-solid fa-trash"></i> Clear all</button>
+            </div>
+          </div>
+          <div class="notif-filter-tabs">
+            <button class="notif-ftab active" onclick="filterNotifs('all',this)">All</button>
+            <button class="notif-ftab" onclick="filterNotifs('unread',this)">Unread</button>
+            <button class="notif-ftab" onclick="filterNotifs('order',this)">Orders</button>
+            <button class="notif-ftab" onclick="filterNotifs('promo',this)">Announcements</button>
+          </div>
+          <div class="notif-count" id="notifCount"></div>
+          <div id="notifsContainer" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- â”€â”€ PROFILE SECTION â”€â”€ -->
+        <div class="content-section" id="sec-profile">
+          <div class="section-header">
+            <div class="section-title"><i class="fa-solid fa-user"></i> Edit Profile</div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-card-title"><i class="fa-solid fa-user"></i> Personal Information</div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label">Full Name</label>
+                <input class="form-input" id="pfName" type="text" placeholder="Your full name"/>
+              </div>
+              <div class="form-field">
+                <label class="form-label">Phone Number</label>
+                <input class="form-input" id="pfPhone" type="tel" placeholder="08012345678"/>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Email Address</label>
+              <input class="form-input" id="pfEmail" type="email" placeholder="you@example.com" disabled/>
+            </div>
+          </div>
+
+          <div class="form-card">
+            <div class="form-card-title"><i class="fa-solid fa-location-dot"></i> Delivery</div>
+            <div class="form-field">
+              <label class="form-label">Default Delivery Address</label>
+              <input class="form-input" id="pfAddr" type="text" placeholder="Street, area, Benin City"/>
+            </div>
+            <button class="btn-save" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Changes</button>
+          </div>
+
+          <div class="form-card">
+            <div class="form-card-title"><i class="fa-solid fa-right-from-bracket"></i> Account</div>
+            <button class="btn-danger" onclick="confirmSignOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+          </div>
+        </div>
+
+      </div><!-- end main-content -->
+    </div><!-- end page-grid -->
+  </div><!-- end page-wrap -->
+</div><!-- end loggedInContent -->
+
+<!-- TOAST -->
+<div class="toast-msg" id="toastMsg"><i class="fa-solid fa-circle-check"></i><span id="toastText"></span></div>
+
+<script>
+// â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const TK = 'vp_customer_token';
+const UD = 'vp_customer_data';
+const NK = 'vp_notifications';
+
+function getToken(){ return localStorage.getItem(TK); }
+function getUser(){ try{ return JSON.parse(localStorage.getItem(UD)); }catch(e){ return null; } }
+
+// â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let toastT;
+function showToast(icon, msg){
+  clearTimeout(toastT);
+  document.getElementById('toastText').textContent = msg;
+  const t = document.getElementById('toastMsg');
+  t.querySelector('i').className = 'fa-solid ' + icon;
+  t.classList.add('show');
+  toastT = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+// â”€â”€ Status config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const statusConfig = {
+  new:          { icon:'fa-clock',        color:'#5b9fff', label:'Received',   bg:'rgba(91,159,255,.12)',  pct:10  },
+  preparing:    { icon:'fa-fire',         color:'#f5c842', label:'Preparing',  bg:'rgba(245,200,66,.12)',  pct:35  },
+  ready:        { icon:'fa-bell',         color:'#ff7a1a', label:'Ready',      bg:'rgba(255,122,26,.12)',  pct:60  },
+  transporting: { icon:'fa-motorcycle',   color:'#ff7a1a', label:'On the Way', bg:'rgba(255,122,26,.12)',  pct:80  },
+  delivered:    { icon:'fa-circle-check', color:'#22c55e', label:'Delivered',  bg:'rgba(34,197,94,.12)',   pct:100 },
+  cancelled:    { icon:'fa-circle-xmark', color:'#ff4d6d', label:'Cancelled',  bg:'rgba(255,77,109,.12)',  pct:0   },
+  rejected:     { icon:'fa-ban',          color:'#ff4d6d', label:'Rejected',   bg:'rgba(255,77,109,.12)',  pct:0   },
+};
+
+// â”€â”€ Section switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let currentSection = 'orders';
+function switchSection(name){
+  currentSection = name;
+  // Content sections
+  document.querySelectorAll('.content-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name)?.classList.add('active');
+  // Desktop sidebar
+  document.querySelectorAll('.sb-nav-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('sbn-'+name)?.classList.add('active');
+  // Mobile tabs
+  document.querySelectorAll('.mobile-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('mbn-'+name)?.classList.add('active');
+
+  if(name==='notifications') markAllNotifsRead();
+  if(name==='orders' && !allOrders.length) loadOrders();
+}
+
+// â”€â”€ Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let allOrders = [];
+let currentOrderFilter = 'all';
+
+function filterOrdersBy(filter, el){
+  currentOrderFilter = filter;
+  document.querySelectorAll('.ofd-tab').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderOrders(allOrders);
+}
+
+function buildTimeline(status){
+  const steps = [
+    { key:'new',          label:'Received',  icon:'fa-clock' },
+    { key:'preparing',    label:'Preparing', icon:'fa-fire' },
+    { key:'ready',        label:'Ready',     icon:'fa-bell' },
+    { key:'transporting', label:'On Way',    icon:'fa-motorcycle' },
+    { key:'delivered',    label:'Delivered', icon:'fa-circle-check' },
+  ];
+  if(['rejected','cancelled'].includes(status)){
+    return `<div class="order-timeline">
+      <div class="order-timeline-title">Order Status</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--reds);border:1px solid var(--redb);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--red);">
+          <i class="fa-solid fa-${status==='rejected'?'ban':'xmark'}"></i>
+        </div>
+        <div style="font-size:.8rem;font-weight:700;color:var(--red);">${status==='rejected'?'Order Rejected':'Order Cancelled'}</div>
+      </div>
+    </div>`;
+  }
+  const order = ['new','preparing','ready','transporting','delivered'];
+  const currentIndex = order.indexOf(status);
+  const stepsHTML = steps.map((step,i)=>{
+    const cls = i < currentIndex ? 'done-step' : i === currentIndex ? 'active-step' : '';
+    const dotCls = i < currentIndex ? 'done' : i === currentIndex ? 'active' : '';
+    const icon = i < currentIndex ? 'fa-check' : step.icon;
+    return `<div class="ts ${cls}"><div class="ts-dot ${dotCls}"><i class="fa-solid ${icon}"></i></div><div class="ts-label">${step.label}</div></div>`;
+  }).join('');
+  return `<div class="order-timeline"><div class="order-timeline-title">Order Progress</div><div class="timeline-steps">${stepsHTML}</div></div>`;
+}
+
+function renderOrders(orders){
+  const container = document.getElementById('ordersContainer');
+  let filtered = orders;
+  if(currentOrderFilter==='active') filtered=orders.filter(o=>!['delivered','cancelled','rejected'].includes(o.status));
+  else if(currentOrderFilter==='delivered') filtered=orders.filter(o=>o.status==='delivered');
+  else if(currentOrderFilter==='cancelled') filtered=orders.filter(o=>['cancelled','rejected'].includes(o.status));
+
+  // Update stats
+  const statEl = document.getElementById('statOrders');
+  if(statEl) statEl.textContent = orders.length;
+
+  if(!filtered.length){
+    container.innerHTML = `<div class="empty-state">
+      <i class="fa-solid fa-receipt"></i>
+      <h3>No orders here</h3>
+      <p>${currentOrderFilter==='all'?'Your order history will appear here. <a href="/">Order now â†’</a>':'No orders in this category yet.'}</p>
+    </div>`;
+    return;
+  }
+  container.innerHTML = filtered.map(o=>{
+    const sc = statusConfig[o.status]||{icon:'fa-circle',color:'#aaa',label:o.status,bg:'rgba(255,255,255,.05)',pct:0};
+    const items = (o.items||[]).map(i=>`<span class="order-item-chip">${i.name||i.itemName||'Item'} Ã—${i.qty||i.quantity||1}</span>`).join('');
+    const dateStr = new Date(o.createdAt).toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true});
+    return `<div class="order-card" id="order-card-${o._id}">
+      <div class="order-progress"><div class="order-progress-fill" style="width:${sc.pct}%;background:${sc.color};"></div></div>
+      <div class="order-card-body">
+        <div class="order-top">
+          <div><div class="order-ref">REF: ${o.ref||o.reference||(String(o._id||'')).slice(-8).toUpperCase()}</div><div class="order-date">${dateStr}</div></div>
+          <div class="order-status-badge" style="background:${sc.bg};color:${sc.color};">
+            <i class="fa-solid ${sc.icon}" style="font-size:.62rem;"></i>${sc.label}
+          </div>
+        </div>
+        <div class="order-items">${items}</div>
+        <div class="order-footer">
+          <div class="order-meta">
+            <div class="order-meta-item"><i class="fa-solid fa-${o.isDelivery?'motorcycle':'store'}"></i>${o.isDelivery?'Delivery':'Pickup'}</div>
+            <div class="order-meta-item"><i class="fa-solid fa-${o.isPaid?'credit-card':'money-bill'}"></i>${o.isPaid?'Paid Online':'Cash'}</div>
+          </div>
+          <div class="order-total">â‚¦${Number(o.grandTotal||0).toLocaleString()}</div>
+        </div>
+        ${o.rejectionReason?`<div class="order-rejection"><i class="fa-solid fa-circle-info"></i><span>${o.rejectionReason}</span></div>`:''}
+        ${buildTimeline(o.status)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateOrderCard(orderId, newStatus, rejectionReason){
+  const order = allOrders.find(o=>String(o._id)===String(orderId));
+  if(order){
+    order.status = newStatus;
+    if(rejectionReason) order.rejectionReason = rejectionReason;
+    renderOrders(allOrders);
+  }
+}
+
+async function loadOrders(){
+  const token = getToken();
+  const loading = document.getElementById('ordersLoading');
+  const container = document.getElementById('ordersContainer');
+  loading.style.display = 'flex';
+  container.innerHTML = '';
+  try {
+    const res = await fetch('/api/orders/my', { headers:{ Authorization:'Bearer '+token } });
+    const data = await res.json();
+    loading.style.display = 'none';
+    if(!data.success || !data.orders || !data.orders.length){
+      allOrders = [];
+      container.innerHTML = `<div class="empty-state"><i class="fa-solid fa-receipt"></i><h3>No orders yet</h3><p>Your order history will appear here. <a href="/">Order now â†’</a></p></div>`;
+      return;
+    }
+    allOrders = data.orders;
+    renderOrders(allOrders);
+  } catch(e) {
+    loading.style.display = 'none';
+    try{
+      const cached = JSON.parse(localStorage.getItem('vp_my_orders')||'[]');
+      if(cached.length){ allOrders=cached; renderOrders(allOrders); return; }
+    }catch(e2){}
+    container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-wifi"></i><h3>Could not load orders</h3><p>Check your connection and try again.</p></div>';
+  }
+}
+
+// â”€â”€ Notifications â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+let currentNotifFilter = 'all';
+
+function getNotifs(){ try{ return JSON.parse(localStorage.getItem(NK))||[]; }catch(e){ return []; } }
+function saveNotifs(notifs){ localStorage.setItem(NK, JSON.stringify(notifs)); }
+
+function addNotif(title, message, icon){
+  const notifs = getNotifs();
+  notifs.unshift({ id:Date.now(), title, message, icon:icon||'fa-bell', time:new Date().toISOString(), read:false });
+  if(notifs.length > 50) notifs.splice(50);
+  saveNotifs(notifs);
+  renderNotifs();
+  updateNotifBadge();
+}
+
+function getNotifIconClass(icon){
+  if(!icon) return 'ni-info';
+  if(icon.includes('fire')||icon.includes('clock')||icon.includes('check')||icon.includes('motorcycle')||icon.includes('ban')||icon.includes('xmark')) return 'ni-order';
+  if(icon.includes('triangle')||icon.includes('exclamation')||icon.includes('ban')) return 'ni-alert';
+  if(icon.includes('circle-check')||icon.includes('star')) return 'ni-success';
+  if(icon.includes('bullhorn')||icon.includes('tag')||icon.includes('percent')) return 'ni-promo';
+  return 'ni-info';
+}
+
+function filterNotifs(filter, el){
+  currentNotifFilter = filter;
+  document.querySelectorAll('.notif-ftab').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderNotifs();
+}
+
+function renderNotifs(){
+  const allNotifs = getNotifs();
+  let notifs = allNotifs;
+  if(currentNotifFilter==='unread') notifs=allNotifs.filter(n=>!n.read);
+  else if(currentNotifFilter==='order') notifs=allNotifs.filter(n=>getNotifIconClass(n.icon)==='ni-order');
+  else if(currentNotifFilter==='promo') notifs=allNotifs.filter(n=>getNotifIconClass(n.icon)==='ni-promo'||n.icon==='fa-bullhorn');
+
+  const container = document.getElementById('notifsContainer');
+  const countEl   = document.getElementById('notifCount');
+  const unread    = allNotifs.filter(n=>!n.read).length;
+  if(countEl) countEl.textContent = unread > 0 ? unread + ' unread notification' + (unread!==1?'s':'') : allNotifs.length + ' notification' + (allNotifs.length!==1?'s':'');
+
+  if(!notifs.length){
+    container.innerHTML = `<div class="notif-empty">
+      <i class="fa-solid fa-bell-slash"></i>
+      <h3>${currentNotifFilter==='unread'?'All caught up!':'No notifications yet'}</h3>
+      <p>${currentNotifFilter==='unread'?'You have no unread notifications.':'Order updates and announcements will appear here.'}</p>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = notifs.map(n=>{
+    const d = new Date(n.time);
+    const now = new Date();
+    const diffMs = now - d;
+    const diffMin = Math.floor(diffMs/60000);
+    const diffHr  = Math.floor(diffMs/3600000);
+    const diffDay = Math.floor(diffMs/86400000);
+    let timeStr;
+    if(diffMin < 1) timeStr = 'Just now';
+    else if(diffMin < 60) timeStr = diffMin + 'm ago';
+    else if(diffHr < 24) timeStr = diffHr + 'h ago';
+    else if(diffDay < 7) timeStr = diffDay + 'd ago';
+    else timeStr = d.toLocaleDateString('en-NG',{day:'numeric',month:'short'});
+
+    const iconClass = getNotifIconClass(n.icon);
+    return `<div class="notif-card ${n.read?'':'unread'}" onclick="markNotifRead(${n.id})">
+      <div class="notif-icon-wrap ${iconClass}"><i class="fa-solid ${n.icon||'fa-bell'}"></i></div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title||'Notification'}</div>
+        <div class="notif-msg">${n.message||''}</div>
+        <div class="notif-time"><i class="fa-regular fa-clock"></i>${timeStr}</div>
+      </div>
+      ${!n.read?'<div class="notif-unread-dot"></div>':''}
+    </div>`;
+  }).join('');
+}
+
+function markNotifRead(id){
+  const notifs = getNotifs();
+  const n = notifs.find(x=>x.id===id);
+  if(n && !n.read){ n.read=true; saveNotifs(notifs); renderNotifs(); updateNotifBadge(); }
+}
+function markAllNotifsRead(){
+  const notifs = getNotifs();
+  let changed = false;
+  notifs.forEach(n=>{ if(!n.read){ n.read=true; changed=true; } });
+  if(changed){ saveNotifs(notifs); renderNotifs(); updateNotifBadge(); }
+}
+function clearAllNotifs(){
+  if(!confirm('Clear all notifications?')) return;
+  saveNotifs([]);
+  renderNotifs();
+  updateNotifBadge();
+  showToast('fa-trash','Notifications cleared');
+}
+function updateNotifBadge(){
+  const unread = getNotifs().filter(n=>!n.read).length;
+  // Desktop sidebar badge
+  const sb = document.getElementById('sbNotifBadge');
+  if(sb){ sb.textContent=unread; sb.style.display=unread>0?'block':'none'; }
+  // Mobile tab badge
+  const mb = document.getElementById('mobileNotifBadge');
+  if(mb){ mb.textContent=unread; mb.classList.toggle('hide',unread===0); }
+  // Nav bell dot
+  const dot = document.getElementById('navNotifDot');
+  if(dot) dot.classList.toggle('show', unread>0);
+  // Stats
+  const statEl = document.getElementById('statNotifs');
+  if(statEl) statEl.textContent = unread;
+}
+
+// â”€â”€ Profile save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function saveProfile(){
+  const name  = document.getElementById('pfName').value.trim();
+  const phone = document.getElementById('pfPhone').value.trim();
+  const addr  = document.getElementById('pfAddr').value.trim();
+  if(!name){ showToast('fa-circle-exclamation','Please enter your name'); return; }
+  const user = getUser();
+  if(user){ user.full_name=name; user.phone=phone; user.delivery_address=addr; localStorage.setItem(UD,JSON.stringify(user)); }
+  showToast('fa-circle-check','Profile saved!');
+  initPage();
+}
+
+// â”€â”€ Sign out â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function confirmSignOut(){
+  if(!confirm('Sign out of your account?')) return;
+  localStorage.removeItem(TK);
+  localStorage.removeItem(UD);
+  window.location.href = '/';
+}
+
+// â”€â”€ Init page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function initPage(){
+  const token = getToken();
+  const user  = getUser();
+  if(!token || !user){
+    document.getElementById('notLoggedIn').style.display = 'block';
+    return;
+  }
+  document.getElementById('loggedInContent').style.display = 'block';
+
+  const initials = (user.full_name||'U').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('paAvatar').textContent = initials;
+  document.getElementById('paName').textContent   = user.full_name || 'Customer';
+  document.getElementById('paEmail').textContent  = user.email || '';
+
+  // Show mobile stats row
+  const ms = document.getElementById('mobileStats');
+  if(ms && window.innerWidth <= 860) ms.style.display = 'flex';
+
+  document.getElementById('pfName').value  = user.full_name || '';
+  document.getElementById('pfPhone').value = user.phone || '';
+  document.getElementById('pfEmail').value = user.email || '';
+  document.getElementById('pfAddr').value  = user.delivery_address || '';
+
+  loadOrders();
+  renderNotifs();
+  updateNotifBadge();
+
+  // Check URL hash for direct section navigation
+  const hash = window.location.hash.replace('#','');
+  if(['orders','notifications','profile'].includes(hash)) switchSection(hash);
+}
+
+// â”€â”€ Cross-tab notification listener â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+window.addEventListener('storage', function(e){
+  if(e.key === NK){ renderNotifs(); updateNotifBadge(); }
+  if(e.key === 'vp_notification_push' && e.newValue){
+    try{
+      const d = JSON.parse(e.newValue);
+      addNotif(d.title||'ðŸ“¢ Update', d.message||'', 'fa-bullhorn');
+      showToast('fa-bullhorn', (d.title||'Update') + ': ' + (d.message||'').slice(0,60));
+    }catch(err){}
+  }
+  if(e.key === 'vp_last_order_update' && e.newValue){
+    try{
+      const updateData = JSON.parse(localStorage.getItem(e.newValue)||'{}');
+      if(updateData.orderId && updateData.status){
+        const sc = statusConfig[updateData.status];
+        if(sc){
+          const msgMap = {
+            preparing:'Your order is being prepared! ðŸ‘¨â€ðŸ³',
+            ready:'Your order is ready! ðŸ””',
+            delivered:'Your order has been delivered! ðŸŽ‰',
+            cancelled:'Your order was cancelled. '+(updateData.rejectionReason||''),
+            rejected:'Your order was rejected. '+(updateData.rejectionReason||''),
+          };
+          if(msgMap[updateData.status]) addNotif(sc.label+' â€” Your Order', msgMap[updateData.status], sc.icon);
+          updateOrderCard(updateData.orderId, updateData.status, updateData.rejectionReason);
+        }
+      }
+    }catch(err){}
+  }
+});
+
+// â”€â”€ Socket.IO for live updates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+(function(){
+  var script = document.createElement('script');
+  script.src = '/socket.io/socket.io.js';
+  script.onload = function(){
+    try {
+      var socket = io({ transports:['websocket','polling'] });
+      socket.on('order_updated', function(order){
+        // Only process if this order belongs to the current user
+        var isMyOrder = allOrders.some(function(o){ return String(o._id)===String(order._id||order.id); });
+        if(!isMyOrder) return;
+        var sc = statusConfig[order.status];
+        if(!sc) return;
+        var msgMap = {
+          preparing:'We\'re in the kitchen preparing your food! ðŸ‘¨â€ðŸ³',
+          transporting:'Your order is on its way! ðŸ›µ',
+          delivered:'Your order has been delivered. Enjoy your meal! ðŸŽ‰',
+          ready:'Your order is ready for pickup! ðŸ””',
+          cancelled:'Your order was cancelled. '+(order.rejectionReason||''),
+          rejected:'Your order was rejected. '+(order.rejectionReason||''),
+        };
+        if(msgMap[order.status]){
+          var title = sc.label+' â€” Order #'+(order.ref||order.reference||(String(order._id||'')).slice(-6).toUpperCase());
+          addNotif(title, msgMap[order.status], sc.icon);
+          showToast(sc.icon, msgMap[order.status].slice(0,60));
+          updateOrderCard(order._id, order.status, order.rejectionReason);
+        }
+      });
+
+      // â”€â”€ order_status_update: emitted by admin dashboard on Accept/Reject/Cancel â”€â”€
+      socket.on('order_status_update', function(data){
+        var isMyOrder = allOrders.some(function(o){ return String(o._id)===String(data.orderId||data._id); });
+        if(!isMyOrder) return;
+        var sc = statusConfig[data.status];
+        if(!sc) return;
+        var msgMap = {
+          preparing:'We\'ve accepted your order and are preparing it now! ðŸ‘¨â€ðŸ³',
+          ready:'Your order is ready! ðŸ””',
+          transporting:'Your order is on its way to you! ðŸ›µ',
+          delivered:'Your order has been delivered. Thank you! ðŸŽ‰',
+          cancelled:'Your order was cancelled. '+(data.rejectionReason||'Contact us for help.'),
+          rejected:'Your order was rejected. '+(data.rejectionReason||'Contact us for help.'),
+        };
+        if(msgMap[data.status]){
+          var ref = data.ref || (String(data.orderId||data._id||'')).slice(-6).toUpperCase();
+          addNotif(sc.label+' â€” Order #'+ref, msgMap[data.status], sc.icon);
+          showToast(sc.icon, msgMap[data.status].slice(0,65));
+          updateOrderCard(data.orderId||data._id, data.status, data.rejectionReason);
+        }
+      });
+      socket.on('customer_announcement', function(data){
+        addNotif(data.title||'ðŸ“¢ Update', data.message||'', 'fa-bullhorn');
+        showToast('fa-bullhorn', (data.title||'Update')+': '+(data.message||'').slice(0,55));
+      });
+      socket.on('announcement', function(data){
+        addNotif(data.title||'ðŸ“¢ Update', data.message||'', 'fa-bullhorn');
+        showToast('fa-bullhorn', data.message||'Update from the kitchen');
+      });
+      socket.on('ordering_status_changed', function(data){
+        if(!data.enabled){
+          addNotif('ðŸš« Ordering Paused','Online ordering is temporarily unavailable. Please call us.','fa-ban');
+          showToast('fa-ban','Online ordering is currently unavailable.');
+        } else {
+          addNotif('âœ… Ordering Resumed','Online ordering is back! Place your order now.','fa-circle-check');
+          showToast('fa-circle-check','Ordering is back online!');
+        }
+      });
+    } catch(e){ console.warn('Socket.IO unavailable:', e.message); }
+  };
+  document.head.appendChild(script);
+})();
+
+// Init
+initPage();
+</script>
+</body>
+</html>
